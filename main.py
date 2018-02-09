@@ -3,15 +3,15 @@ import pyglet
 from pyglet.gl import *
 from collections import OrderedDict
 from os import urandom, walk
-from os.path import isfile
+from os.path import isfile, abspath
 from math import *
 from time import time, sleep
 from json import loads, dumps
 from subprocess import Popen, PIPE, STDOUT
 from hashlib import sha256
-from pytun import TunTapDevice, IFF_TAP
-from pyroute2 import IPDB, IPRoute, netns, NetNS
-from pprint import pprint
+#from pytun import TunTapDevice, IFF_TAP
+#from pyroute2 import IPDB, IPRoute, netns, NetNS
+#from pprint import pprint
 
 pyglet.options['audio'] = ('alsa', 'openal', 'silent')
 key = pyglet.window.key
@@ -70,20 +70,20 @@ def comp_settings(x, y, **conf):
 
 def copy_template(x, y, **conf):
 	_id_ = genUID()
-	config['virtual_machines'][_id_] = config['virtual_machines'][conf['id']]
+	config['virtual_machines'][_id_] = conf#config['virtual_machines'][conf['id']]
 	config['pages'][config['active_page']]['sprites'][_id_] = computer(texture=conf['icon'], width=30, height=30, x=x-15, y=y-15, txtmode='under', rbind=comp_settings, rparams={'id' : _id_})
 
 def add_computer(x, y, **conf):
 	_id_ = genUID()
 	config['pages'][config['active_page']]['sprites'][_id_] = computer(x=x-15, y=y-15, name=_id_, txtmode='under', rbind=comp_settings, rparams={'id' : _id_})
-	with IPDB() as ip:
-		config['virtual_interfaces'][_id_] = ip.create(ifname='v0p0', kind='veth', peer='v0p1').commit()
-		config['virtual_namespaces'][_id_] = {'v0p0' : False, 'v0p1' : True}
-		config['pages'][config['active_page']]['sprites'][_id_].tap = 'v0p0'
-		
-		netns.create(_id_)
-		with ip.interfaces.v0p1 as veth:
-			veth.net_ns_fd = _id_
+#	with IPDB() as ip:
+#		config['virtual_interfaces'][_id_] = ip.create(ifname='v0p0', kind='veth', peer='v0p1').commit()
+#		config['virtual_namespaces'][_id_] = {'v0p0' : False, 'v0p1' : True}
+#		config['pages'][config['active_page']]['sprites'][_id_].tap = 'v0p0'
+#		
+#		netns.create(_id_)
+#		with ip.interfaces.v0p1 as veth:
+#			veth.net_ns_fd = _id_
 
 		#ns = NetNS(_id_)
 		#pprint(ns)
@@ -97,13 +97,13 @@ def add_switch(x, y):
 	name = 'switch'+str(len(config['virtual_interfaces']))
 	config['pages'][config['active_page']]['sprites'][_id_] = switch(x=x-15, y=y-15, txtmode='under', name=name)
 	
-	with IPDB() as ip:
-		# Create the bridge:
-		with ip.create(kind='bridge', ifname=name) as i:
-			config['virtual_interfaces'][name] = {'ifi_type' : -1, 'ifname' : name}
-			print('Created switch')
-			#i.add_port('lo')
-			#i.add_ip('10.0.8.2/24')
+#	with IPDB() as ip:
+#		# Create the bridge:
+#		with ip.create(kind='bridge', ifname=name) as i:
+#			config['virtual_interfaces'][name] = {'ifi_type' : -1, 'ifname' : name}
+#			print('Created switch')
+#			#i.add_port('lo')
+#			#i.add_ip('10.0.8.2/24')
 
 	#config['virtual_interfaces'][name] = TunTapDevice(name=name, flags=IFF_TAP)
 	#config['virtual_interfaces'][name].addr = '10.8.0.2'
@@ -139,12 +139,12 @@ class generic_sprite(pyglet.sprite.Sprite):
 			scale = True
 
 		if type(texture) == str:
-			if not texture or not isfile(texture):
+			if not texture or not isfile(abspath(texture)):
 				#print('No texutre could be loaded for sprite, generating a blank one.')
 				## If no texture was supplied, we will create one
 				self.texture = gen_solid_image(int(width), int(height), color, alpha)
 			else:
-				self.texture = pyglet.image.load(texture)
+				self.texture = pyglet.image.load(abspath(texture))
 
 		elif texture is None:
 			self.texture = gen_solid_image(int(width), int(height), color, alpha)
@@ -242,9 +242,9 @@ class generic_sprite(pyglet.sprite.Sprite):
 
 			if type(self) == computer and type(wif) == switch:
 				print('Computer -> Switch')
-				with IPDB() as ip:
-					print('switch1.add_port(v0p0)')
-					ip.interfaces['switch1'].add_port('v0p0')
+#				with IPDB() as ip:
+#					print('switch1.add_port(v0p0)')
+#					ip.interfaces['switch1'].add_port('v0p0')
 
 			#print('{}({}) -> {}({})'.format(self, type(self), wif, type(wif)))
 
@@ -427,9 +427,9 @@ for root, folders, files in walk('./'):
 			conf = loads(template.read())
 
 		name = filename.rsplit('.',1)[0]
-		if not 'icon' in conf:
-			if isfile('./'+name+'.png'):
-				conf['icon'] = './'+name+'.png'
+		if not 'icon' in conf or not isfile(abspath(conf['icon'])):
+			if isfile(abspath('./icon_'+name+'.png')):
+				conf['icon'] = abspath('./'+name+'.png')
 			else:
 				conf['icon'] = None
 

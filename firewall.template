@@ -1,0 +1,3 @@
+{"mem" : 1024,
+ "cdrom" : "/var/lib/libvirt/images/archlinux-2017.04.01-x86_64.iso",
+ "icon" : "/home/anthvo/Desktop/VManager/icon_firewall.png"}

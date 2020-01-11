@@ -1,0 +1,12 @@
+[submodule "dependencies/slimHTTP"]
+	path = dependencies/slimHTTP
+	url = https://github.com/Torxed/slimHTTP.git
+	branch = master
+[submodule "dependencies/spiderWeb"]
+	path = dependencies/spiderWeb
+	url = https://github.com/Torxed/spiderWeb.git
+	branch = master
+[submodule "dependencies/Vmanager"]
+	path = dependencies/Vmanager
+	url = https://github.com/Torxed/Vmanager.git
+	branch = master

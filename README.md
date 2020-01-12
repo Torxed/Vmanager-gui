@@ -2,6 +2,8 @@
 
 A graphical front-end for [python-Vmanager](https://github.com/Torxed/Vmanager).
 
+![screen_demo](documentation/screen_demo.gif)
+
 # Dependencies
 
  * [slimHTTP](https://github.com/Torxed/slimHTTP)

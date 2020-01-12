@@ -263,3 +263,11 @@ tr:nth-child(odd) {background: var(--backdrop_light)}
 .machine_started {
 	color: var(--g_primary);
 }
+
+.powerOn {
+	color: var(--g_primary);
+}
+
+.powerOff{
+	color: var(--o_dark);
+}

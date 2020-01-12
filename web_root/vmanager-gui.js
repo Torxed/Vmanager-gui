@@ -117,7 +117,8 @@ class machine {
 		if (this.info['is_running']) {
 			this.title = create_html_obj('h3', {'classList' : 'title machine_started'}, this.main_area);
 			let stop_machine = create_html_obj('button', {'classList' : 'button'}, this.submenu);
-			stop_machine.innerHTML = 'Stop machine';
+			let start_icon = create_html_obj('i', {'classList' : 'fas fa-power-off powerOff'}, stop_machine)
+			stop_machine.innerHTML = stop_machine.innerHTML + ' Stop machine';
 			stop_machine.addEventListener('click', () => {
 				socket.send({
 					'_module' : 'machine',
@@ -128,7 +129,8 @@ class machine {
 		} else {
 			this.title = create_html_obj('h3', {'classList' : 'title machine_stopped'}, this.main_area);
 			let start_machine = create_html_obj('button', {'classList' : 'button'}, this.submenu);
-			start_machine.innerHTML = 'Start machine';
+			let start_icon = create_html_obj('i', {'classList' : 'fas fa-power-off powerOn'}, start_machine)
+			start_machine.innerHTML = start_machine.innerHTML + ' Start machine';
 			start_machine.addEventListener('click', () => {
 				socket.send({
 					'_module' : 'machine',
@@ -252,7 +254,8 @@ class machines {
 		this.main_area = create_html_obj('div', {'classList' : 'overview'}, this.container);
 		this.submenu = create_html_obj('div', {'classList' : 'submenu'}, this.main_area);
 		let add_machine = create_html_obj('button', {'classList' : 'button'}, this.submenu);
-		add_machine.innerHTML = 'Add Machine';
+		let plus_icon = create_html_obj('i', {'classList' : 'fas fa-plus-square'}, add_machine);
+		add_machine.innerHTML = add_machine.innerHTML + ' Add Machine';
 
 		add_machine.addEventListener('click', () => {
 			let popup_body = document.createElement('div');

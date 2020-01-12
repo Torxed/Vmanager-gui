@@ -261,6 +261,14 @@
 			padding: 4px;
 			font-weight: bold;
 		}
+
+		.machine_stopped {
+			color: var(--o_dark);
+		}
+
+		.machine_started {
+			color: var(--g_primary);
+		}
 	</style>
 	<script src="/slimWebSocket.js"></script>
 	<script type="text/javascript">
@@ -374,18 +382,82 @@
 
 			build() {
 				this.container.innerHTML = '';
+				console.log('Machine is rendering.')
 
 				this.main_area = create_html_obj('div', {'classList' : 'machine'}, this.container);
-				this.title = create_html_obj('h3', {'classList' : 'title'}, this.main_area);
+				this.submenu = create_html_obj('div', {'classList' : 'submenu'}, this.main_area);
+
+
+				if (this.info['is_running']) {
+					this.title = create_html_obj('h3', {'classList' : 'title machine_started'}, this.main_area);
+					let stop_machine = create_html_obj('button', {'classList' : 'button'}, this.submenu);
+					stop_machine.innerHTML = 'Stop machine';
+					stop_machine.addEventListener('click', () => {
+						socket.send({
+							'_module' : 'machine',
+							'target' : this.info['machine'],
+							'action' : 'stop'
+						})
+					})
+				} else {
+					this.title = create_html_obj('h3', {'classList' : 'title machine_stopped'}, this.main_area);
+					let start_machine = create_html_obj('button', {'classList' : 'button'}, this.submenu);
+					start_machine.innerHTML = 'Start machine';
+					start_machine.addEventListener('click', () => {
+						socket.send({
+							'_module' : 'machine',
+							'target' : this.info['machine'],
+							'action' : 'start'
+						})
+					})
+				}
 				this.title.innerHTML = this.info['machine'];
 
+				/*
+					Render Network Interfaces:
+				*/
 				this.nics = div({'classList' : 'nics'}, this.main_area);
-				let machine_list = table(
+				this.nics_title = create_html_obj('h3', {'classList' : 'title'}, this.nics);
+				this.nics_title.innerHTML = 'Network Interfaces:'
+				let nic_list = table(
 					['NIC Name', 'IP', 'State', 'Endpoint'],
 					this.info['data']['nics'],
 					{'classList' : 'table'}, this.nics, (row) => {
 						socket.send({
 							'_module' : 'virtualnic',
+							'target' : row
+						})
+				});
+
+				/*
+					Render Harddrives:
+				*/
+				this.hdds = div({'classList' : 'harddrives'}, this.main_area);
+				this.hdds_title = create_html_obj('h3', {'classList' : 'title'}, this.hdds);
+				this.hdds_title.innerHTML = 'Harddrives:'
+				let hdd_list = table(
+					['Harddrive', 'Size (GB)', 'Format', 'Snapshots'],
+					this.info['data']['hdds'],
+					{'classList' : 'table'}, this.hdds, (row) => {
+						socket.send({
+							'_module' : 'harddrive',
+							'target' : row
+						})
+				});
+
+				/*
+					Render CD-rom's:
+				*/
+				this.cds = div({'classList' : 'cdroms'}, this.main_area);
+				this.cds_title = create_html_obj('h3', {'classList' : 'title'}, this.cds);
+				this.cds_title.innerHTML = 'CD-rom\'s:'
+				let cd = this.info['data']['cds'];
+				let cd_list = table(
+					['CD-rom'],
+					{[cd] : {}},
+					{'classList' : 'table'}, this.cds, (row) => {
+						socket.send({
+							'_module' : 'cdrom',
 							'target' : row
 						})
 				});
@@ -400,6 +472,7 @@
 
 			build() {
 				this.container.innerHTML = '';
+				console.log('Overview is rendering.')
 				this.main_area = create_html_obj('div', {'classList' : 'overview'}, this.container);
 
 				/*
@@ -409,26 +482,29 @@
 					there's more issues to tackle before this is useable.
 				*/
 				socket.subscribe('machines', (json_payload) => {
+					console.log('Overview is rendering [data triggered].')
 					if (typeof json_payload['machines'] !== 'undefined') {
+						this.container.innerHTML = '';
 
 						this.machines = div({'classList' : 'machines'}, this.main_area);
 						let machines_header = h3('Machines', {}, this.machines);
 						let machine_list = table(
 							['Machine Name', 'NIC\'s', 'Harddrives', 'CD\'s'],
 							json_payload['machines'],
-							{'classList' : 'table'}, this.machines, (row) => {
+							{'classList' : 'table overview'}, this.machines, (row) => {
 								socket.send({
 									'_module' : 'machine',
 									'target' : row
 								})
 						});
 
-						this.container.innerHTML = '';
+						console.log('Adding machines:', this.machines);
 						this.container.appendChild(this.machines);
 					}
 				})
 
 				socket.subscribe('machine', (json_payload) => {
+					console.log('Machine is rendering [data triggered].')
 					let tmp = new machine(json_payload, document.querySelector('.body'));
 				})
 
@@ -444,6 +520,9 @@
 
 			build() {
 				this.container.innerHTML = '';
+				console.log('Machines is rendering.')
+				socket.clear_subscribers();
+
 				this.main_area = create_html_obj('div', {'classList' : 'overview'}, this.container);
 				this.submenu = create_html_obj('div', {'classList' : 'submenu'}, this.main_area);
 				let add_machine = create_html_obj('button', {'classList' : 'button'}, this.submenu);
@@ -491,6 +570,7 @@
 				})
 
 				socket.subscribe('machines', (json_payload) => {
+					console.log('Machines is rendering [data triggered].')
 					if (typeof json_payload['machines'] !== 'undefined') {
 
 						this.machines = div({'classList' : 'machines'}, this.main_area);
@@ -498,7 +578,7 @@
 						let machine_list = table(
 							['Machine Name', 'NIC\'s', 'Harddrives', 'CD\'s'],
 							json_payload['machines'],
-							{'classList' : 'table'}, this.machines, (row) => {
+							{'classList' : 'table machines'}, this.machines, (row) => {
 								socket.send({
 									'_module' : 'machine',
 									'target' : row

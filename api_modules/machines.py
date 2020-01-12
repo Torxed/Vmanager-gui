@@ -9,13 +9,12 @@ class parser():
 			response = {'machines' : {}}
 			for machine_name in vmanager.machines:
 				response['machines'][machine_name] = {
-					'nics' : 0,
-					'hdds' : 0,
-					'cds' : 0
+					'nics' : len(vmanager.machines[machine_name].nics),
+					'hdds' : len(vmanager.machines[machine_name].harddrives),
+					'cds' : vmanager.machines[machine_name].cd.filename
 				}
 
-			#return response
-			return {'machines' : {'Machine0' : {'nics' : 2, 'hdds' : 1, 'cds' : 1}}}
+			return response
 
 		else:
 			if 'details' in data['machines']:
@@ -26,10 +25,9 @@ class parser():
 				for machine_name in vmanager.machines:
 					if target and machine_name != target: continue
 					response['machines'][machine_name] = {
-						'nics' : 0,
-						'hdds' : 0,
-						'cds' : 0
+						'nics' : len(vmanager.machines[machine_name].nics),
+						'hdds' : len(vmanager.machines[machine_name].harddrives),
+						'cds' : vmanager.machines[machine_name].cd.filename
 					}
 
-				# return response
-				return {'machines' : {'Machine0' : {'nics' : 2, 'hdds' : 1, 'cds' : 1}}}
+				return response

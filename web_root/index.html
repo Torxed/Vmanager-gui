@@ -2,8 +2,588 @@
 <html>
 <head>
 	<title>Vmanager GUI</title>
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+	<style type="text/css">
+		/* https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=546e7a&secondary.color=9CCC65 */
+		:root {
+			--primary: #546e7a;
+			--dark: #29434e;
+			--light: #819ca9;
+			--p_text: #FFFFFF;
+			--borders: #8899a1;
+			
+			--backdrop_dark: #E1E2E1;
+			--backdrop_light: #F5F5F6;
+
+			--o_primary: #ff7043;
+			--o_light: #ffa270;
+			--o_dark: #c63f17;
+			--o_text: #000000;
+
+			--g_primary: #9ccc65;
+			--g_light: #cfff95;
+			--g_dark: #6b9b37;
+			--g_text: #000000;
+		}
+
+		body, html {
+			font-family: 'Source Sans Pro', sans-serif;
+			background-color: var(--backdrop_light);
+
+			margin: 0px;
+			padding: 0px;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+
+			width: 100%;
+			height: 100%;
+
+			-ms-text-size-adjust: 100%;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+		}
+
+		h3, table, tr, td {
+			margin: 0px;
+			padding: 0px;
+			border-collapse: collapse;
+			border-spacing: 0;
+		}
+
+		h3 {
+			font-size: 20px;
+			font-weight: bold;
+		}
+
+		.container {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-start;
+			align-content: flex-start;
+			height: 100%;
+		}
+
+		.container > .header {
+			background-color: var(--primary);
+			color: var(--p_text);
+		}
+
+		.container > .header > .menu {
+			display: flex;
+			flex-direction: row;
+			padding: 5px;
+		}
+
+		.container > .header > .menu > .logo {
+			background-image: url('/logo.png');
+			background-size: cover;
+			min-width: 32px;
+			min-height: 32px;
+			max-width: 64px;
+			max-height: 64px;
+
+			margin-right: 5px;
+			margin-left: 5px;
+		}
+
+		.container > .header > .menu > .button {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			margin-left: 2.5px;
+			margin-right: 2.5px;
+			padding-left: 10px;
+			padding-right: 10px;
+
+			border: 1px solid var(--borders);
+			border-radius: 3px;
+		}
+
+		.container > .header > .menu > .button:hover {
+			background-color: var(--backdrop_light);
+			color: var(--o_text);
+			cursor: pointer;
+		}
+
+		.stylebar {
+			background-color: var(--dark);
+			border-bottom: 0.5px solid var(--borders);
+			min-height: 15px;
+			font-size: 0.7em;
+
+			display: flex;
+			flex-direction: row;
+
+			justify-content: flex-end;
+			padding-right: 5px;
+
+			color: var(--borders);
+		}
+
+		.container > .body {
+			flex-grow: 1;
+			padding: 5px;
+		}
+
+		.container > .footer {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			margin-top: auto;
+			background-color: var(--backdrop_dark);
+			padding: 2.5px;
+		}
+
+		.container > .footer > a {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.container > .footer > a > * {
+			margin-left: 2.5px;
+			margin-right: 2.5px;
+			text-decoration: none;
+		}
+
+		.right {
+			margin-left: auto !important;
+		}
+
+		tr {
+			margin: 0px;
+		}
+		td.header {
+			margin: 0px;
+			padding: 5px;
+			background-color: var(--primary) !important;
+			color: var(--p_text);
+		}
+		td.column {
+			margin: 0px;
+			padding: 5px;
+		}
+		.row {
+			cursor: pointer;
+		}
+
+		tr:nth-child(even) {background: var(--light)}
+		tr:nth-child(odd) {background: var(--backdrop_light)}
+
+		.popup {
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			background-color: #272822;
+			border: 1px solid #49483E;
+			display: flex;
+			min-height: 0;
+			flex-direction: column;
+			flex-grow: 1;
+			flex-shrink: 0;
+			flex-basis: 100%;
+		}
+			.popup > .title {
+				font-weight: bold;
+				font-size: 14px;
+				padding: 5px;
+				color: var(--p_text);
+				flex: 1;
+				background-color: var(--primary);
+			}
+
+			.popup > .body {
+				padding: 5px;
+				margin: 5px;
+				color: #F8F8F2;
+				flex: 1;
+
+				display: flex;
+				flex-direction: column;
+			}
+
+				.popup > .body > * {
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+				}
+
+			.popup > .buttons {
+				display: flex;
+				flex-direction: row;
+				border-top: 1px solid var(--light);
+				padding: 4px;
+			}
+				.popup > .buttons > .Save {
+					flex: 1;
+					color: var(--power-on);
+					border-right: 1px solid var(--light);
+				}
+					.popup > .buttons > .Save:hover {
+						font-weight: bold;
+					}
+
+				.popup > .buttons > .OK {
+					flex: 1;
+					color: var(--g_primary);
+					border-right: 1px solid var(--light);
+				}
+					.popup > .buttons > .OK:hover {
+						font-weight: bold;
+					}
+
+				.popup > .buttons > .Discard {
+					flex: 1;
+					color: var(--o_primary);
+				}
+					.popup > .buttons > .Discard:hover {
+						font-weight: bold;
+					}
+				.popup > .buttons > .Cancel {
+					flex: 1;
+					color: var(--o_primary);
+				}
+					.popup > .buttons > .Cancel:hover {
+						font-weight: bold;
+					}
+
+		.popup_header {
+			background-color: var(--light-blue);
+			color: #FFFFFF;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			border-bottom: 1px solid var(--light-blue-border);
+			padding: 4px;
+			font-weight: bold;
+		}
+	</style>
+	<script src="/slimWebSocket.js"></script>
+	<script type="text/javascript">
+		let socket = null;
+
+		let elements = {}; // Used for popups
+		function popup(title_content, body_content, buttons_struct=null) {
+			let div = document.createElement('div');
+			let stylebar = document.createElement('div');
+			stylebar.classList = 'stylebar';
+			div.id = 'popup_'+(Math.random() * 1001);
+			div.classList = 'popup';
+			let title = document.createElement('div');
+			title.classList = 'title';
+			if(typeof title_content === 'string')
+				title.innerHTML = title_content;
+			else
+				title.appendChild(title_content);
+			let body = document.createElement('div');
+			body.classList = 'body';
+			if(typeof body_content === 'string')
+				body.innerHTML = body_content;
+			else
+				body.appendChild(body_content);
+			
+			div.appendChild(stylebar);
+			div.appendChild(title);
+			div.appendChild(body);
+			
+			if(buttons_struct) {
+				let buttons = document.createElement('div');
+				buttons.classList = 'buttons';
+				Object.keys(buttons_struct).forEach(function(label, index) {
+					let button = document.createElement('button');
+					button.innerHTML = label;
+					button.classList = label;
+					button.addEventListener('click', function(event) {
+						buttons_struct[label](div);
+					});
+					buttons.appendChild(button);
+				})
+				div.appendChild(buttons);
+			}
+			elements[title] = div;
+			document.getElementsByTagName("body")[0].appendChild(div);
+			return div;
+		}
+
+		function append_stats_to_html_obj(obj, stats) {
+			if (typeof stats.id !== 'undefined')
+				obj.id = stats.id;
+			if (typeof stats.classList !== 'undefined')
+				obj.classList = stats.classList;
+		}
+
+		function create_html_obj(type, stats, parent) {
+			let obj = document.createElement(type);
+			append_stats_to_html_obj(obj, stats);
+
+			if (parent)
+				parent.appendChild(obj);
+
+			return obj
+		}
+
+		function div(stats={}, parent=null) {
+			return create_html_obj('div', stats, parent);
+		}
+
+		function h3(text, stats={}, parent=null) {
+			let o = create_html_obj('h3', stats, parent);
+			o.innerHTML = text;
+			return o;
+		}
+
+		function table(headers, entries, stats, parent, row_click=null) {
+			let o = create_html_obj('table', stats, parent);
+
+			let header = create_html_obj('tr', {'classList' : 'header'}, o);
+			headers.forEach((title) => {
+				let h = create_html_obj('td', {'classList' : 'header'}, header);
+				h.innerHTML = title;
+			})
+
+			Object.keys(entries).forEach((row) => {
+				let row_obj = create_html_obj('tr', {'classList' : 'row'}, o);
+				let first_column = create_html_obj('td', {'classList' : 'column'}, row_obj);
+				first_column.innerHTML = row;
+				Object.keys(entries[row]).forEach((column) => {
+					let column_obj = create_html_obj('td', {'classList' : 'column'}, row_obj);
+					column_obj.innerHTML = entries[row][column];
+				})
+
+				if (row_click)
+					row_obj.addEventListener('click', () => {
+						row_click(row);
+					});
+			})
+
+			return o;
+		}
+
+		class machine {
+			constructor(info, container) {
+				this.container = container;
+				this.info = info;
+				this.html_obj = this.build();
+
+				console.log('Machine info:', info);
+			}
+
+			build() {
+				this.container.innerHTML = '';
+
+				this.main_area = create_html_obj('div', {'classList' : 'machine'}, this.container);
+				this.title = create_html_obj('h3', {'classList' : 'title'}, this.main_area);
+				this.title.innerHTML = this.info['machine'];
+
+				this.nics = div({'classList' : 'nics'}, this.main_area);
+				let machine_list = table(
+					['NIC Name', 'IP', 'State', 'Endpoint'],
+					this.info['data']['nics'],
+					{'classList' : 'table'}, this.nics, (row) => {
+						socket.send({
+							'_module' : 'virtualnic',
+							'target' : row
+						})
+				});
+			}
+		}
+
+		class overview {
+			constructor(container) {
+				this.container = container;
+				this.html_obj = this.build();
+			}
+
+			build() {
+				this.container.innerHTML = '';
+				this.main_area = create_html_obj('div', {'classList' : 'overview'}, this.container);
+
+				/*
+					To be honest, create a machine-area in this.main_area
+					and use the machines() class to render the machines.
+					No point in duplicating code.. but works for now since
+					there's more issues to tackle before this is useable.
+				*/
+				socket.subscribe('machines', (json_payload) => {
+					if (typeof json_payload['machines'] !== 'undefined') {
+
+						this.machines = div({'classList' : 'machines'}, this.main_area);
+						let machines_header = h3('Machines', {}, this.machines);
+						let machine_list = table(
+							['Machine Name', 'NIC\'s', 'Harddrives', 'CD\'s'],
+							json_payload['machines'],
+							{'classList' : 'table'}, this.machines, (row) => {
+								socket.send({
+									'_module' : 'machine',
+									'target' : row
+								})
+						});
+
+						this.container.innerHTML = '';
+						this.container.appendChild(this.machines);
+					}
+				})
+
+				socket.subscribe('machine', (json_payload) => {
+					let tmp = new machine(json_payload, document.querySelector('.body'));
+				})
+
+				return this.main_area.innerHTML;
+			}
+		}
+
+		class machines {
+			constructor(container) {
+				this.container = container;
+				this.html_obj = this.build();
+			}
+
+			build() {
+				this.container.innerHTML = '';
+				this.main_area = create_html_obj('div', {'classList' : 'overview'}, this.container);
+				this.submenu = create_html_obj('div', {'classList' : 'submenu'}, this.main_area);
+				let add_machine = create_html_obj('button', {'classList' : 'button'}, this.submenu);
+				add_machine.innerHTML = 'Add Machine';
+
+				add_machine.addEventListener('click', () => {
+					let popup_body = document.createElement('div');
+					popup_body.classList = 'card';
+
+					let popup_header = document.createElement('div');
+					popup_header.classList = 'popup_header';
+					popup_header.innerHTML = 'Create a new Virtual Machine';
+					popup_body.appendChild(popup_header);
+
+					let machine_name = create_html_obj('input', {'classList' : 'popup_field'}, popup_body);
+					machine_name.placeholder = 'Machine name';
+
+					let machine_nics = create_html_obj('input', {'classList' : 'popup_field'}, popup_body);
+					machine_nics.placeholder = 'Number of NIC\'s';
+
+					let machine_hdds = create_html_obj('input', {'classList' : 'popup_field'}, popup_body);
+					machine_hdds.placeholder = 'Number of Harddrives';
+
+					let machine_cd = create_html_obj('input', {'classList' : 'popup_field'}, popup_body);
+					machine_cd.placeholder = 'CD (iso) path';
+					machine_cd.value = '/home/anton/archinstall_iso/out/archlinux-2019.11.29-x86_64.iso';
+
+					popup("New Virtual Machine", popup_body, {
+						"OK" : function(div) {
+							socket.send({
+								'_module' : 'machine',
+								'new' : {
+									'name' : machine_name.value,
+									'nics' : parseInt(machine_nics.value),
+									'harddrives' : parseInt(machine_hdds.value),
+									'cd' : machine_cd.value
+								}
+							})
+							div.remove();
+						},
+						"Cancel" : function(div) {
+							div.remove();
+						}
+					});
+				})
+
+				socket.subscribe('machines', (json_payload) => {
+					if (typeof json_payload['machines'] !== 'undefined') {
+
+						this.machines = div({'classList' : 'machines'}, this.main_area);
+						let machines_header = h3('Machines', {}, this.machines);
+						let machine_list = table(
+							['Machine Name', 'NIC\'s', 'Harddrives', 'CD\'s'],
+							json_payload['machines'],
+							{'classList' : 'table'}, this.machines, (row) => {
+								socket.send({
+									'_module' : 'machine',
+									'target' : row
+								});
+						})
+						
+						this.container.innerHTML = '';
+						this.container.appendChild(this.main_area);
+					}
+
+				})
+
+				socket.subscribe('machine', (json_payload) => {
+					let tmp = new machine(json_payload, document.querySelector('.body'));
+				})
+				return this.main_area.innerHTML;
+			}
+		}
+
+		window.onload = function() {
+			socket = new slimWebSocket('wss://127.0.0.1');
+
+			socket.clear_subscribers();
+			let oview = new overview(document.querySelector('.body'));
+
+			socket.send({
+				'_module' : 'machines'
+			})
+
+			document.querySelector('#btn_overview').addEventListener('click', (event) => {
+				resource_handlers = {};
+				let oview = new overview(document.querySelector('.body'));
+
+				socket.send({
+					'_module' : 'machines'
+				})	
+			})
+
+			document.querySelector('#btn_machines').addEventListener('click', (event) => {
+				socket.clear_subscribers();
+				let oview = new machines(document.querySelector('.body'));
+
+				socket.send({
+					'_module' : 'machines',
+					'machines' : {
+						'details' : true
+					}
+				})	
+			})
+
+			let x = [
+				"https://img.shields.io/github/languages/code-size/Torxed/Vmanager-gui",
+				"https://img.shields.io/github/downloads/Torxed/Vmanager-gui/total",
+				"https://img.shields.io/github/languages/top/Torxed/Vmanager-gui",
+				"https://img.shields.io/badge/python-3%2B-blue"
+			].forEach((url) => {
+				let img = document.createElement('img');
+				img.src = url;
+				document.querySelector('#footer_links').appendChild(img);
+			})
+		}
+	</script>
 </head>
 <body>
-	Welcome!
+	<div class="container">
+		<div class="header">
+			<div class="stylebar">Vmanager v0.1</div>
+			<div class="menu">
+				<div class="logo"></div>
+
+				<div class="button" id="btn_overview">Overview</div>
+				<div class="button" id="btn_machines">Machines</div>
+				<div class="button" id="btn_network">Network</div>
+				<div class="button" id="btn_resources">Resources</div>
+				<div class="button right" id="btn_editor">Graphical Editor</div>
+			</div>
+		</div>
+		<div class="body">
+			
+		</div>
+		<div class="footer">
+			<a href="https://github.com/Torxed/Vmanager-gui" id="footer_links">
+				
+			</a>
+		</div>
+	</div>
 </body>
 </html>

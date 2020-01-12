@@ -192,13 +192,14 @@ class pre_parser():
 							}
 				except BaseException as e:
 					log(f'Module error: {e}', level=2, origin='pre_parser', function='parse')
+					traceback.print_exc()
 		else:
 			log(f'Invalid data, trying to load a inexisting module: {module_to_load} ({str(data)[:200]})', level=3, origin='pre_parser', function='parse')	
-
 
 __builtins__.__dict__['LOG_LEVEL'] = LOG_LEVELS.INFO
 __builtins__.__dict__['safedict'] = _safedict
 __builtins__.__dict__['log'] = _log
+__builtins__.__dict__['modules'] = safedict()
 __builtins__.__dict__['importer'] = _importer
 __builtins__.__dict__['sockets'] = safedict()
 __builtins__.__dict__['config'] = safedict({
@@ -229,12 +230,17 @@ else:
 ## (This so it doesn't break the logging..)
 from dependencies.slimHTTP import slimhttpd
 from dependencies.spiderWeb import spiderWeb
+from dependencies.Vmanager import vmanager as _vmanager
+__builtins__.__dict__['vmanager'] = _vmanager
+
 
 websocket = spiderWeb.upgrader({'default': pre_parser()})
 handlers = [
 	slimhttpd.http_serve(upgrades={b'websocket': websocket}),
 	slimhttpd.https_serve(upgrades={b'websocket': websocket}, cert='cert.pem', key='key.pem')
 ]
+
+vmanager.update_interface_cache()
 
 while 1:
 	for handler in handlers:

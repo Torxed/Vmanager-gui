@@ -1,0 +1,265 @@
+/* https://material.io/resources/color/#!/?view.left=0&view.right=0&primary.color=546e7a&secondary.color=9CCC65 */
+:root {
+	--primary: #546e7a;
+	--dark: #29434e;
+	--light: #819ca9;
+	--p_text: #FFFFFF;
+	--borders: #8899a1;
+	
+	--backdrop_dark: #E1E2E1;
+	--backdrop_light: #F5F5F6;
+
+	--o_primary: #ff7043;
+	--o_light: #ffa270;
+	--o_dark: #c63f17;
+	--o_text: #000000;
+
+	--g_primary: #9ccc65;
+	--g_light: #cfff95;
+	--g_dark: #6b9b37;
+	--g_text: #000000;
+}
+
+body, html {
+	font-family: 'Source Sans Pro', sans-serif;
+	background-color: var(--backdrop_light);
+
+	margin: 0px;
+	padding: 0px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+
+	width: 100%;
+	height: 100%;
+
+	-ms-text-size-adjust: 100%;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+h3, table, tr, td {
+	margin: 0px;
+	padding: 0px;
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+h3 {
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-content: flex-start;
+	height: 100%;
+}
+
+.container > .header {
+	background-color: var(--primary);
+	color: var(--p_text);
+}
+
+.container > .header > .menu {
+	display: flex;
+	flex-direction: row;
+	padding: 5px;
+}
+
+.container > .header > .menu > .logo {
+	background-image: url('/logo.png');
+	background-size: cover;
+	min-width: 32px;
+	min-height: 32px;
+	max-width: 64px;
+	max-height: 64px;
+
+	margin-right: 5px;
+	margin-left: 5px;
+}
+
+.container > .header > .menu > .button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	margin-left: 2.5px;
+	margin-right: 2.5px;
+	padding-left: 10px;
+	padding-right: 10px;
+
+	border: 1px solid var(--borders);
+	border-radius: 3px;
+}
+
+.container > .header > .menu > .button:hover {
+	background-color: var(--backdrop_light);
+	color: var(--o_text);
+	cursor: pointer;
+}
+
+.stylebar {
+	background-color: var(--dark);
+	border-bottom: 0.5px solid var(--borders);
+	min-height: 15px;
+	font-size: 0.7em;
+
+	display: flex;
+	flex-direction: row;
+
+	justify-content: flex-end;
+	padding-right: 5px;
+
+	color: var(--borders);
+}
+
+.container > .body {
+	flex-grow: 1;
+	padding: 5px;
+}
+
+.container > .footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	margin-top: auto;
+	background-color: var(--backdrop_dark);
+	padding: 2.5px;
+}
+
+.container > .footer > a {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.container > .footer > a > * {
+	margin-left: 2.5px;
+	margin-right: 2.5px;
+	text-decoration: none;
+}
+
+.right {
+	margin-left: auto !important;
+}
+
+tr {
+	margin: 0px;
+}
+td.header {
+	margin: 0px;
+	padding: 5px;
+	background-color: var(--primary) !important;
+	color: var(--p_text);
+}
+td.column {
+	margin: 0px;
+	padding: 5px;
+}
+.row {
+	cursor: pointer;
+}
+
+tr:nth-child(even) {background: var(--light)}
+tr:nth-child(odd) {background: var(--backdrop_light)}
+
+.popup {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	background-color: #272822;
+	border: 1px solid #49483E;
+	display: flex;
+	min-height: 0;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 0;
+	flex-basis: 100%;
+}
+	.popup > .title {
+		font-weight: bold;
+		font-size: 14px;
+		padding: 5px;
+		color: var(--p_text);
+		flex: 1;
+		background-color: var(--primary);
+	}
+
+	.popup > .body {
+		padding: 5px;
+		margin: 5px;
+		color: #F8F8F2;
+		flex: 1;
+
+		display: flex;
+		flex-direction: column;
+	}
+
+		.popup > .body > * {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+
+	.popup > .buttons {
+		display: flex;
+		flex-direction: row;
+		border-top: 1px solid var(--light);
+		padding: 4px;
+	}
+		.popup > .buttons > .Save {
+			flex: 1;
+			color: var(--power-on);
+			border-right: 1px solid var(--light);
+		}
+			.popup > .buttons > .Save:hover {
+				font-weight: bold;
+			}
+
+		.popup > .buttons > .OK {
+			flex: 1;
+			color: var(--g_primary);
+			border-right: 1px solid var(--light);
+		}
+			.popup > .buttons > .OK:hover {
+				font-weight: bold;
+			}
+
+		.popup > .buttons > .Discard {
+			flex: 1;
+			color: var(--o_primary);
+		}
+			.popup > .buttons > .Discard:hover {
+				font-weight: bold;
+			}
+		.popup > .buttons > .Cancel {
+			flex: 1;
+			color: var(--o_primary);
+		}
+			.popup > .buttons > .Cancel:hover {
+				font-weight: bold;
+			}
+
+.popup_header {
+	background-color: var(--light-blue);
+	color: #FFFFFF;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	border-bottom: 1px solid var(--light-blue-border);
+	padding: 4px;
+	font-weight: bold;
+}
+
+.machine_stopped {
+	color: var(--o_dark);
+}
+
+.machine_started {
+	color: var(--g_primary);
+}

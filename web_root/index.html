@@ -5,12 +5,26 @@
 	<link rel="stylesheet" type="text/css" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
 	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="/vmanager-gui.css">
-	<script src="/slimWebSocket.js"></script>
+	<script type="text/javascript">
+		let socket = null;
+
+		let xhr = new XMLHttpRequest();
+		xhr.open("GET", 'https://raw.githubusercontent.com/Torxed/slimWebSocket/master/slimWebSocket.js', true);
+		xhr.onreadystatechange = function() {
+			if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+				let script = document.createElement('script');
+				script.type = 'text/javascript';
+				script.innerHTML = this.responseText;
+				document.head.appendChild(script);
+
+				socket = new slimWebSocket('wss://127.0.0.1');
+			}
+		}
+		xhr.send();
+	</script>
 	<script src="/vmanager-gui.js"></script>
 	<script type="text/javascript">
 		window.onload = function() {
-			socket = new slimWebSocket('wss://127.0.0.1');
-
 			socket.clear_subscribers();
 			let oview = new overview(document.querySelector('.body'));
 

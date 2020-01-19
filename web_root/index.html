@@ -22,35 +22,41 @@
 		}
 		xhr.send();
 	</script>
+	<script src="/vmanager.js"></script>
 	<script src="/vmanager-gui.js"></script>
 	<script type="text/javascript">
 		window.onload = function() {
-			socket.clear_subscribers();
-			let oview = new overview(document.querySelector('.body'));
+			let loader = setInterval(() => {
+				console.log('moo')
+				if(socket) {
+					socket.clear_subscribers();
+					let view = new overview(document.querySelector('.body'));
 
-			socket.send({
-				'_module' : 'machines'
-			})
+					view_machines();
+
+					clearInterval(loader);
+				}
+			}, 200)
 
 			document.querySelector('#btn_overview').addEventListener('click', (event) => {
 				resource_handlers = {};
-				let oview = new overview(document.querySelector('.body'));
+				let view = new overview(document.querySelector('.body'));
 
-				socket.send({
-					'_module' : 'machines'
-				})	
+				view_machines();
 			})
 
 			document.querySelector('#btn_machines').addEventListener('click', (event) => {
 				socket.clear_subscribers();
-				let oview = new machines(document.querySelector('.body'));
+				let view = new machines(document.querySelector('.body'));
 
-				socket.send({
-					'_module' : 'machines',
-					'machines' : {
-						'details' : true
-					}
-				})	
+				view_machines(true);
+			})
+
+			document.querySelector('#btn_network').addEventListener('click', (event) => {
+				socket.clear_subscribers();
+				let view = new networkinterfaces(document.querySelector('.body'));
+
+				view_nics(true);
 			})
 
 			let x = [

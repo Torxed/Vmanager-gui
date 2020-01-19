@@ -1,5 +1,3 @@
-let socket = null;
-
 let elements = {}; // Used for popups
 function popup(title_content, body_content, buttons_struct=null) {
 	let div = document.createElement('div');
@@ -120,11 +118,7 @@ class machine {
 			let start_icon = create_html_obj('i', {'classList' : 'fas fa-power-off powerOff'}, stop_machine)
 			stop_machine.innerHTML = stop_machine.innerHTML + ' Stop machine';
 			stop_machine.addEventListener('click', () => {
-				socket.send({
-					'_module' : 'machine',
-					'target' : this.info['machine'],
-					'action' : 'stop'
-				})
+				machine_stop(this.info['machine']);
 			})
 		} else {
 			this.title = create_html_obj('h3', {'classList' : 'title machine_stopped'}, this.main_area);
@@ -132,11 +126,7 @@ class machine {
 			let start_icon = create_html_obj('i', {'classList' : 'fas fa-power-off powerOn'}, start_machine)
 			start_machine.innerHTML = start_machine.innerHTML + ' Start machine';
 			start_machine.addEventListener('click', () => {
-				socket.send({
-					'_module' : 'machine',
-					'target' : this.info['machine'],
-					'action' : 'start'
-				})
+				machine_start(this.info['machine']);
 			})
 		}
 		this.title.innerHTML = this.info['machine'];
@@ -151,10 +141,7 @@ class machine {
 			['NIC Name', 'IP', 'State', 'Endpoint'],
 			this.info['data']['nics'],
 			{'classList' : 'table'}, this.nics, (row) => {
-				socket.send({
-					'_module' : 'virtualnic',
-					'target' : row
-				})
+				view_nic(row);
 		});
 
 		/*
@@ -167,10 +154,7 @@ class machine {
 			['Harddrive', 'Size (GB)', 'Format', 'Snapshots'],
 			this.info['data']['hdds'],
 			{'classList' : 'table'}, this.hdds, (row) => {
-				socket.send({
-					'_module' : 'harddrive',
-					'target' : row
-				})
+				view_harddrive(row);
 		});
 
 		/*
@@ -184,10 +168,7 @@ class machine {
 			['CD-rom'],
 			{[cd] : {}},
 			{'classList' : 'table'}, this.cds, (row) => {
-				socket.send({
-					'_module' : 'cdrom',
-					'target' : row
-				})
+				view_cdrom(row);
 		});
 	}
 }
@@ -220,10 +201,7 @@ class overview {
 					['Machine Name', 'NIC\'s', 'Harddrives', 'CD\'s'],
 					json_payload['machines'],
 					{'classList' : 'table overview'}, this.machines, (row) => {
-						socket.send({
-							'_module' : 'machine',
-							'target' : row
-						})
+						view_machine(row);
 				});
 
 				console.log('Adding machines:', this.machines);
@@ -281,15 +259,10 @@ class machines {
 
 			popup("New Virtual Machine", popup_body, {
 				"OK" : function(div) {
-					socket.send({
-						'_module' : 'machine',
-						'new' : {
-							'name' : machine_name.value,
-							'nics' : parseInt(machine_nics.value),
-							'harddrives' : parseInt(machine_hdds.value),
-							'cd' : machine_cd.value
-						}
-					})
+					create_machine(machine_name.value,
+									parseInt(machine_nics.value),
+									parseInt(machine_hdds.value),
+									machine_cd.value)
 					div.remove();
 				},
 				"Cancel" : function(div) {
@@ -308,10 +281,7 @@ class machines {
 					['Machine Name', 'NIC\'s', 'Harddrives', 'CD\'s'],
 					json_payload['machines'],
 					{'classList' : 'table machines'}, this.machines, (row) => {
-						socket.send({
-							'_module' : 'machine',
-							'target' : row
-						});
+						view_machine(row);
 				})
 				
 				this.container.innerHTML = '';
@@ -322,6 +292,71 @@ class machines {
 
 		socket.subscribe('machine', (json_payload) => {
 			let tmp = new machine(json_payload, document.querySelector('.body'));
+		})
+		return this.main_area.innerHTML;
+	}
+}
+
+class networkinterfaces {
+	constructor(container) {
+		this.container = container;
+		this.html_obj = this.build();
+	}
+
+	build() {
+		this.container.innerHTML = '';
+		socket.clear_subscribers();
+
+		this.main_area = create_html_obj('div', {'classList' : 'overview'}, this.container);
+		this.submenu = create_html_obj('div', {'classList' : 'submenu'}, this.main_area);
+		let add_interface = create_html_obj('button', {'classList' : 'button'}, this.submenu);
+		let plus_icon = create_html_obj('i', {'classList' : 'fas fa-plus-square'}, add_interface);
+		add_interface.innerHTML = add_interface.innerHTML + ' Add Virtual Interface';
+
+		add_interface.addEventListener('click', () => {
+			let popup_body = document.createElement('div');
+			popup_body.classList = 'card';
+
+			let popup_header = document.createElement('div');
+			popup_header.classList = 'popup_header';
+			popup_header.innerHTML = 'Create a new Virtual Network Interface';
+			popup_body.appendChild(popup_header);
+
+			let nic_name = create_html_obj('input', {'classList' : 'popup_field'}, popup_body);
+			nic_name.placeholder = 'NIC Name';
+
+			popup("New Virtual Machine", popup_body, {
+				"OK" : function(div) {
+					create_nic(nic_name.value);
+					div.remove();
+				},
+				"Cancel" : function(div) {
+					div.remove();
+				}
+			});
+		})
+
+		socket.subscribe('nics', (json_payload) => {
+			console.log(json_payload)
+			if (typeof json_payload['nics'] !== 'undefined') {
+
+				this.nics = div({'classList' : 'nics'}, this.main_area);
+				let nics_header = h3('nics', {}, this.nics);
+				let nics_list = table(
+					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Connected to'],
+					json_payload['nics'],
+					{'classList' : 'table nics'}, this.nics, (row) => {
+						view_nic(row);
+				})
+				
+				this.container.innerHTML = '';
+				this.container.appendChild(this.main_area);
+			}
+
+		})
+
+		socket.subscribe('nic', (json_payload) => {
+			let tmp = new networkinterface(json_payload, document.querySelector('.body'));
 		})
 		return this.main_area.innerHTML;
 	}

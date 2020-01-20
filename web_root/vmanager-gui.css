@@ -106,7 +106,6 @@ h3 {
 .submenu > .button:hover {
 	color: var(--g_primary);
 	background-color: #FFFFFF;
-
 }
 
 .container > .header > .menu > .button:hover {
@@ -191,6 +190,11 @@ td.column {
 
 tr:nth-child(even) {background: var(--light)}
 tr:nth-child(odd) {background: var(--backdrop_light)}
+
+option.bold {
+	font-weight: bold;
+	color: var(--o_primary);
+}
 
 .popup {
 	position: absolute;

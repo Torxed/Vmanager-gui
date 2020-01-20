@@ -28,7 +28,28 @@ class parser():
 	def process(self, path, client, data, headers, fileno, addr, *args, **kwargs):
 		print('### nic ###\n', data, client)
 		
-		if 'new' in data:
-			vmanager.VirtualNic(data['new']['name'])
+		if 'state' in data and 'target' in data:
+			if data['target'] in vmanager.nics:
+				if data['state']:
+					vmanager.nics[data['target']].up()
+				else:
+					vmanager.nics[data['target']].down()
+			elif data['target'] in vmanager.interfaces:
+				if data['state']:
+					vmanager.interfaces[data['target']].up()
+				else:
+					vmanager.interfaces[data['target']].down()
+			elif data['target'] in vmanager.routers:
+				if data['state']:
+					vmanager.routers[data['target']].up()
+				else:
+					vmanager.routers[data['target']].down()
+			elif data['target'] in vmanager.switches:
+				if data['state']:
+					vmanager.switches[data['target']].up()
+				else:
+					vmanager.switches[data['target']].down()
+			else:
+				print(f'[N] Could not locate {data["target"]}')
 
 			return get_overview()

@@ -113,3 +113,11 @@ function create_router(name, trunk) {
 		}
 	})
 }
+
+function change_interface_state(target, state) {
+	socket.send({
+		'_module' : 'interface',
+		'state' : state,
+		'target' : target
+	})
+}

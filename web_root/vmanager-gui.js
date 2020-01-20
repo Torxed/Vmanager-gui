@@ -1,3 +1,5 @@
+interfaces = {}
+
 let elements = {}; // Used for popups
 function popup(title_content, body_content, buttons_struct=null) {
 	let div = document.createElement('div');
@@ -68,7 +70,7 @@ function h3(text, stats={}, parent=null) {
 	return o;
 }
 
-function table(headers, entries, stats, parent, row_click=null) {
+function table(headers, entries, stats, parent, row_click=null, special_columns={}) {
 	let o = create_html_obj('table', stats, parent);
 
 	let header = create_html_obj('tr', {'classList' : 'header'}, o);
@@ -83,7 +85,12 @@ function table(headers, entries, stats, parent, row_click=null) {
 		first_column.innerHTML = row;
 		Object.keys(entries[row]).forEach((column) => {
 			let column_obj = create_html_obj('td', {'classList' : 'column'}, row_obj);
-			column_obj.innerHTML = entries[row][column];
+			if (typeof special_columns[column] !== 'undefined') {
+				let special_obj = special_columns[column](row, column, entries[row][column]);
+				column_obj.appendChild(special_obj);
+			} else {
+				column_obj.innerHTML = entries[row][column];
+			}
 		})
 
 		if (row_click)
@@ -93,6 +100,58 @@ function table(headers, entries, stats, parent, row_click=null) {
 	})
 
 	return o;
+}
+
+function update_interface_cache(json) {
+	Object.keys(json).forEach((category) => {
+		interfaces[category] = json[category];
+	})
+}
+
+function slider(row, column, data) {
+	let _switch = create_html_obj('div', {'classList' : 'onoffswitch'})
+	let input = create_html_obj('input', {'classList' : 'onoffswitch-checkbox', 'id' : 'slider_'+row}, _switch);
+	input.type = 'checkbox';
+	input.name = 'onoffswitch';
+	if(data === true || data == 'up')
+		input.checked = true;
+	else
+		input.checked = false;
+
+	let label = create_html_obj('label', {'classList' : 'onoffswitch-label'}, _switch)
+	label.htmlFor = 'slider_'+row;
+
+	let spaninner = create_html_obj('span', {'classList' : 'onoffswitch-inner'}, label);
+	let spanswitch = create_html_obj('span', {'classList' : 'onoffswitch-switch'}, label);
+
+	return _switch
+}
+
+function connected_to(row, column, data) {
+	let dropdown = document.createElement('select');
+	dropdown.classList = 'dropdown';
+	dropdown.id = row+'_connect_to';
+
+	let none = document.createElement('option');
+	none.classList = 'bold';
+	none.innerHTML = 'No connection';
+	dropdown.appendChild(none);
+
+	Object.keys(interfaces).forEach((category) => {
+		if (interfaces[category] && typeof interfaces[category] == 'object' && Object.keys(interfaces[category]).length) {
+			let iface_category = document.createElement('option');
+			iface_category.innerHTML = category + ':';
+			iface_category.classList = 'bold';
+			dropdown.appendChild(iface_category);
+			Object.keys(interfaces[category]).forEach((iface_name) => {
+				let option = document.createElement('option');
+				option.value = iface_name;
+				option.innerHTML = iface_name;
+				dropdown.appendChild(option);
+			})
+		}
+	})
+	return dropdown;
 }
 
 class machine {
@@ -394,7 +453,12 @@ class networkinterfaces {
 
 		socket.subscribe('vnics', (json_payload) => {
 			console.log(json_payload)
+
+			update_interface_cache(json_payload);
+
 			if (typeof json_payload['vnics'] !== 'undefined') {
+				this.main_area.innerHTML = '';
+				this.main_area.appendChild(this.submenu)
 
 				this.vnics = div({'classList' : 'vnics'}, this.main_area);
 				let interfaces_header = h3('Physical Interfaces', {}, this.vnics);
@@ -403,31 +467,88 @@ class networkinterfaces {
 					json_payload['interfaces'],
 					{'classList' : 'table interfaces'}, this.vnics, (row) => {
 						view_nic(row);
-				})
+					},
+					{
+						'state' : (row, column, data) => {
+							let obj = slider(row, column, data);
+							obj.querySelector('input').setAttribute('nic', row);
+							obj.addEventListener('click', (event) => {
+								let slider_obj = event.target.parentElement.parentElement.querySelector('input');
+								
+								change_interface_state(slider_obj.getAttribute('nic'), slider_obj.checked);
+							})
+							return obj;
+						}
+					}
+				)
 
 				let vnics_header = h3('Virtual Interfaces', {}, this.vnics);
 				let vnics_list = table(
-					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Connected to'],
-					json_payload['vnics'],
-					{'classList' : 'table vnics'}, this.vnics, (row) => {
+					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Connected to'], // Headers
+					json_payload['vnics'], // Data to be parsed
+					{'classList' : 'table vnics'}, // Set attributes on the table
+					this.vnics, // Which parent are this table going to be inserted into
+					(row) => { // What should happen when we click on each row?
 						view_nic(row);
-				})
+					},
+					{ // Any special columns that we should render differently?
+						'connected_to' : connected_to,
+						'state' : (row, column, data) => {
+							let obj = slider(row, column, data);
+							obj.querySelector('input').setAttribute('nic', row);
+							obj.addEventListener('click', (event) => {
+								let slider_obj = event.target.parentElement.parentElement.querySelector('input');
+								
+								change_interface_state(slider_obj.getAttribute('nic'), slider_obj.checked);
+							})
+							return obj;
+						}
+					}
+				)
 
 				let switches_header = h3('Virtual Switches', {}, this.vnics);
 				let switches_list = table(
-					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Connected to'],
+					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Trunk Connection'],
 					json_payload['switches'],
 					{'classList' : 'table switches'}, this.vnics, (row) => {
 						view_switch(row);
-				})
+					},
+					{
+						'connected_to' : connected_to,
+						'state' : (row, column, data) => {
+							let obj = slider(row, column, data);
+							obj.querySelector('input').setAttribute('nic', row);
+							obj.addEventListener('click', (event) => {
+								let slider_obj = event.target.parentElement.parentElement.querySelector('input');
+								
+								change_interface_state(slider_obj.getAttribute('nic'), slider_obj.checked);
+							})
+							return obj;
+						}
+					}
+				)
 
 				let routers_header = h3('Virtual Routers', {}, this.vnics);
 				let routers_list = table(
-					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Connected to'],
+					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Input Link'],
 					json_payload['routers'],
 					{'classList' : 'table routers'}, this.vnics, (row) => {
 						view_router(row);
-				})
+					},
+					{
+						'connected_to' : connected_to,
+						'state' : (row, column, data) => {
+							let obj = slider(row, column, data);
+							obj.querySelector('input').setAttribute('nic', row);
+							obj.addEventListener('click', (event) => {
+								let slider_obj = event.target.parentElement.parentElement.querySelector('input');
+								
+								change_interface_state(slider_obj.getAttribute('nic'), slider_obj.checked);
+							})
+							return obj;
+						}
+					}
+				)
 				
 				this.container.innerHTML = '';
 				this.container.appendChild(this.main_area);

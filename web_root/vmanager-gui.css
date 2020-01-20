@@ -63,10 +63,14 @@ h3 {
 	color: var(--p_text);
 }
 
-.container > .header > .menu {
+.container > .header > .menu,
+.submenu {
 	display: flex;
 	flex-direction: row;
 	padding: 5px;
+}
+.submenu {
+	height: 30px;
 }
 
 .container > .header > .menu > .logo {
@@ -81,7 +85,8 @@ h3 {
 	margin-left: 5px;
 }
 
-.container > .header > .menu > .button {
+.menu > .button,
+.submenu > .button {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -93,12 +98,31 @@ h3 {
 
 	border: 1px solid var(--borders);
 	border-radius: 3px;
+	cursor: pointer;
+}
+.submenu > .button {
+	background-color: var(--backdrop_dark);
+}
+.submenu > .button:hover {
+	color: var(--g_primary);
+	background-color: #FFFFFF;
+
 }
 
 .container > .header > .menu > .button:hover {
 	background-color: var(--backdrop_light);
 	color: var(--o_text);
 	cursor: pointer;
+}
+
+i.fas {
+	margin-right: 10px;
+	color: var(--g_dark);
+}
+
+.button.active {
+	color: var(--o_text);
+	background-color: var(--backdrop_light);
 }
 
 .stylebar {

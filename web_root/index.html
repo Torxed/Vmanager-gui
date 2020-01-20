@@ -38,25 +38,26 @@
 				}
 			}, 200)
 
-			document.querySelector('#btn_overview').addEventListener('click', (event) => {
+			document.querySelector('#btn_overview').addEventListener('click', function(event) {
 				resource_handlers = {};
 				let view = new overview(document.querySelector('.body'));
 
 				view_machines();
 			})
 
-			document.querySelector('#btn_machines').addEventListener('click', (event) => {
+			document.querySelector('#btn_machines').addEventListener('click', function(event) {
 				socket.clear_subscribers();
 				let view = new machines(document.querySelector('.body'));
 
 				view_machines(true);
 			})
 
-			document.querySelector('#btn_network').addEventListener('click', (event) => {
+			document.querySelector('#btn_network').addEventListener('click', function(event) {
 				socket.clear_subscribers();
 				let view = new networkinterfaces(document.querySelector('.body'));
 
 				view_nics(true);
+				this.classList.toggle('active');
 			})
 
 			let x = [

@@ -60,6 +60,20 @@ function view_cdrom(target) {
 	})
 }
 
+function view_router(target) {
+	socket.send({
+		'_module' : 'router',
+		'target' : target
+	})
+}
+
+function view_switch(target) {
+	socket.send({
+		'_module' : 'switch',
+		'target' : target
+	})
+}
+
 function create_machine(name, nics, harddrives, cd) {
 	socket.send({
 		'_module' : 'machine',
@@ -77,6 +91,25 @@ function create_nic(name) {
 		'_module' : 'virtualnic',
 		'new' : {
 			'name' : name
+		}
+	})
+}
+
+function create_switch(name) {
+	socket.send({
+		'_module' : 'switch',
+		'new' : {
+			'name' : name
+		}
+	})
+}
+
+function create_router(name, trunk) {
+	socket.send({
+		'_module' : 'router',
+		'new' : {
+			'name' : name,
+			'trunk' : trunk
 		}
 	})
 }

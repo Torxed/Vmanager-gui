@@ -309,9 +309,15 @@ class networkinterfaces {
 
 		this.main_area = create_html_obj('div', {'classList' : 'overview'}, this.container);
 		this.submenu = create_html_obj('div', {'classList' : 'submenu'}, this.main_area);
-		let add_interface = create_html_obj('button', {'classList' : 'button'}, this.submenu);
+		let add_interface = create_html_obj('div', {'classList' : 'button'}, this.submenu);
+		let add_switch = create_html_obj('div', {'classList' : 'button'}, this.submenu);
+		let add_router = create_html_obj('div', {'classList' : 'button'}, this.submenu);
 		let plus_icon = create_html_obj('i', {'classList' : 'fas fa-plus-square'}, add_interface);
+		plus_icon = create_html_obj('i', {'classList' : 'fas fa-plus-square'}, add_switch);
+		plus_icon = create_html_obj('i', {'classList' : 'fas fa-plus-square'}, add_router);
 		add_interface.innerHTML = add_interface.innerHTML + ' Add Virtual Interface';
+		add_switch.innerHTML = add_switch.innerHTML + ' Add Virtual Switch'
+		add_router.innerHTML = add_router.innerHTML + ' Add Virtual Router'
 
 		add_interface.addEventListener('click', () => {
 			let popup_body = document.createElement('div');
@@ -325,7 +331,7 @@ class networkinterfaces {
 			let nic_name = create_html_obj('input', {'classList' : 'popup_field'}, popup_body);
 			nic_name.placeholder = 'NIC Name';
 
-			popup("New Virtual Machine", popup_body, {
+			popup("New Virtual NIC", popup_body, {
 				"OK" : function(div) {
 					create_nic(nic_name.value);
 					div.remove();
@@ -336,17 +342,91 @@ class networkinterfaces {
 			});
 		})
 
-		socket.subscribe('nics', (json_payload) => {
-			console.log(json_payload)
-			if (typeof json_payload['nics'] !== 'undefined') {
+		add_switch.addEventListener('click', () => {
+			let popup_body = document.createElement('div');
+			popup_body.classList = 'card';
 
-				this.nics = div({'classList' : 'nics'}, this.main_area);
-				let nics_header = h3('nics', {}, this.nics);
-				let nics_list = table(
+			let popup_header = document.createElement('div');
+			popup_header.classList = 'popup_header';
+			popup_header.innerHTML = 'Create a new Virtual Switch';
+			popup_body.appendChild(popup_header);
+
+			let nic_name = create_html_obj('input', {'classList' : 'popup_field'}, popup_body);
+			nic_name.placeholder = 'Switch Name';
+
+			popup("New Virtual Switch", popup_body, {
+				"OK" : function(div) {
+					create_switch(nic_name.value);
+					div.remove();
+				},
+				"Cancel" : function(div) {
+					div.remove();
+				}
+			});
+		})
+
+		add_router.addEventListener('click', () => {
+			let popup_body = document.createElement('div');
+			popup_body.classList = 'card';
+
+			let popup_header = document.createElement('div');
+			popup_header.classList = 'popup_header';
+			popup_header.innerHTML = 'Create a new Virtual Router';
+			popup_body.appendChild(popup_header);
+
+			let nic_name = create_html_obj('input', {'classList' : 'popup_field'}, popup_body);
+			nic_name.placeholder = 'Router Name';
+
+			let trunk = create_html_obj('input', {'classList' : 'popup_field'}, popup_body);
+			trunk.placeholder = 'Trunk port (interface name)';
+			trunk.value = 'ens4u1';
+
+			popup("New Virtual Router", popup_body, {
+				"OK" : function(div) {
+					create_router(nic_name.value, trunk.value);
+					div.remove();
+				},
+				"Cancel" : function(div) {
+					div.remove();
+				}
+			});
+		})
+
+		socket.subscribe('vnics', (json_payload) => {
+			console.log(json_payload)
+			if (typeof json_payload['vnics'] !== 'undefined') {
+
+				this.vnics = div({'classList' : 'vnics'}, this.main_area);
+				let interfaces_header = h3('Physical Interfaces', {}, this.vnics);
+				let interfaces_list = table(
 					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Connected to'],
-					json_payload['nics'],
-					{'classList' : 'table nics'}, this.nics, (row) => {
+					json_payload['interfaces'],
+					{'classList' : 'table interfaces'}, this.vnics, (row) => {
 						view_nic(row);
+				})
+
+				let vnics_header = h3('Virtual Interfaces', {}, this.vnics);
+				let vnics_list = table(
+					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Connected to'],
+					json_payload['vnics'],
+					{'classList' : 'table vnics'}, this.vnics, (row) => {
+						view_nic(row);
+				})
+
+				let switches_header = h3('Virtual Switches', {}, this.vnics);
+				let switches_list = table(
+					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Connected to'],
+					json_payload['switches'],
+					{'classList' : 'table switches'}, this.vnics, (row) => {
+						view_switch(row);
+				})
+
+				let routers_header = h3('Virtual Routers', {}, this.vnics);
+				let routers_list = table(
+					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Connected to'],
+					json_payload['routers'],
+					{'classList' : 'table routers'}, this.vnics, (row) => {
+						view_router(row);
 				})
 				
 				this.container.innerHTML = '';

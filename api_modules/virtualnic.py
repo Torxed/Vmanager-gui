@@ -8,9 +8,9 @@ def get_overview():
 			'ip' : vmanager.nics[nic_name].ip,
 			'MAC' : vmanager.nics[nic_name].mac,
 			'state' : vmanager.nics[nic_name].state,
-			'gateway' : vmanager.nics[nic_name].ports['sink_name'],
-			'routes' : None,
-			'connected_to' : None
+			'gateway' : vmanager.nics[nic_name].gateway,
+			'routes' : vmanager.nics[nic_name].routes,
+			'connected_to' : vmanager.nics[nic_name].connected_to
 		}
 
 	for nic_name in vmanager.interfaces:
@@ -26,9 +26,7 @@ def get_overview():
 
 class parser():
 	def process(self, path, client, data, headers, fileno, addr, *args, **kwargs):
-		print('### nic ###\n', data, client)
-		
 		if 'new' in data:
-			vmanager.VirtualNic(data['new']['name'])
+			vmanager.VirtualNic(ifname=data['new']['name'])
 
 			return get_overview()

@@ -2,4 +2,6 @@
 **/*.snap*
 **/*.qcow2*
 **/*.raw*
+**/*.bak*
+**/*db.json
 **/*__pycache__

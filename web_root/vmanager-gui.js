@@ -131,6 +131,7 @@ function connected_to(row, column, data) {
 	let dropdown = document.createElement('select');
 	dropdown.classList = 'dropdown';
 	dropdown.id = row+'_connect_to';
+	dropdown.setAttribute('nic', row);
 
 	let none = document.createElement('option');
 	none.classList = 'bold';
@@ -148,9 +149,20 @@ function connected_to(row, column, data) {
 				option.value = iface_name;
 				option.innerHTML = iface_name;
 				dropdown.appendChild(option);
+				if(data.indexOf(iface_name) >= 0)
+					dropdown.value = iface_name;
 			})
 		}
 	})
+
+	dropdown.addEventListener('change', (event) => {
+		socket.send({
+			'_module' : 'interface',
+			'target' : dropdown.getAttribute('nic'),
+			'connect_to' : dropdown.options[dropdown.selectedIndex].value
+		})
+	})
+
 	return dropdown;
 }
 
@@ -365,18 +377,20 @@ class networkinterfaces {
 	build() {
 		this.container.innerHTML = '';
 		socket.clear_subscribers();
-
 		this.main_area = create_html_obj('div', {'classList' : 'overview'}, this.container);
 		this.submenu = create_html_obj('div', {'classList' : 'submenu'}, this.main_area);
 		let add_interface = create_html_obj('div', {'classList' : 'button'}, this.submenu);
 		let add_switch = create_html_obj('div', {'classList' : 'button'}, this.submenu);
 		let add_router = create_html_obj('div', {'classList' : 'button'}, this.submenu);
+		let refresh_interfaces = create_html_obj('div', {'classList' : 'button'}, this.submenu);
 		let plus_icon = create_html_obj('i', {'classList' : 'fas fa-plus-square'}, add_interface);
+		let refresh_icon = create_html_obj('i', {'classList' : 'fas fa-sync-alt'}, refresh_interfaces);
 		plus_icon = create_html_obj('i', {'classList' : 'fas fa-plus-square'}, add_switch);
 		plus_icon = create_html_obj('i', {'classList' : 'fas fa-plus-square'}, add_router);
 		add_interface.innerHTML = add_interface.innerHTML + ' Add Virtual Interface';
-		add_switch.innerHTML = add_switch.innerHTML + ' Add Virtual Switch'
-		add_router.innerHTML = add_router.innerHTML + ' Add Virtual Router'
+		add_switch.innerHTML = add_switch.innerHTML + ' Add Virtual Switch';
+		add_router.innerHTML = add_router.innerHTML + ' Add Virtual Router';
+		refresh_interfaces.innerHTML = refresh_interfaces.innerHTML + ' Refresh interfaces';
 
 		add_interface.addEventListener('click', () => {
 			let popup_body = document.createElement('div');
@@ -449,6 +463,15 @@ class networkinterfaces {
 					div.remove();
 				}
 			});
+		})
+
+		refresh_interfaces.addEventListener('click', () => {
+			socket.send({
+				"_module": "virtualnics",
+				"virtualnics": {
+					"update" : true
+				}
+			})
 		})
 
 		socket.subscribe('vnics', (json_payload) => {
@@ -530,7 +553,7 @@ class networkinterfaces {
 
 				let routers_header = h3('Virtual Routers', {}, this.vnics);
 				let routers_list = table(
-					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Input Link'],
+					['NIC Name', 'IP(s)', 'MAC', 'State', 'Gateway', 'Routes', 'Trunk Connection'],
 					json_payload['routers'],
 					{'classList' : 'table routers'}, this.vnics, (row) => {
 						view_router(row);

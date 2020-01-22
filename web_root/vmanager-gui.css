@@ -139,12 +139,46 @@ i.fas {
 	color: var(--borders);
 }
 
+.stylebar > h3 {
+	color: var(--o_primary);
+	padding-bottom: 2px;
+	margin-right: 3px;
+}
+
+a {
+	text-decoration: none;
+	color: var(--g_dark)
+}
+
+.loginbox {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--g_primary);
+	border-radius: 3px;
+	background-color: var(--light);
+}
+
+	.input {
+		margin: 5px;
+		border-radius: 3px;
+		border: 1px solid var(--borders);
+		padding: 3px;
+	}
+
 .container > .body {
 	flex-grow: 1;
 	padding: 5px;
 }
 
-.container > .footer {
+.container > .body.loginview {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-content: center;
+	align-items: center;
+}
+
+.footer {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
@@ -154,14 +188,18 @@ i.fas {
 	padding: 2.5px;
 }
 
-.container > .footer > a {
+.footerdescription {
+	font-size: 9px;
+}
+
+.footer > a {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
 }
 
-.container > .footer > a > * {
+.footer > a > * {
 	margin-left: 2.5px;
 	margin-right: 2.5px;
 	text-decoration: none;

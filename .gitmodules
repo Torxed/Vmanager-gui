@@ -10,3 +10,7 @@
 	path = dependencies/Vmanager
 	url = https://github.com/Torxed/Vmanager.git
 	branch = master
+[submodule "dependencies/python-olife"]
+	path = dependencies/olife
+	url = git@github.com:Torxed/python-olife.git
+	branch = master

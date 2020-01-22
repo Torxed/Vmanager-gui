@@ -50,6 +50,8 @@ function append_stats_to_html_obj(obj, stats) {
 		obj.id = stats.id;
 	if (typeof stats.classList !== 'undefined')
 		obj.classList = stats.classList;
+	if (typeof stats.innerHTML !== 'undefined')
+		obj.innerHTML = stats['innerHTML'];
 }
 
 function create_html_obj(type, stats, parent) {

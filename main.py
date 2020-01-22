@@ -231,8 +231,14 @@ else:
 from dependencies.slimHTTP import slimhttpd
 from dependencies.spiderWeb import spiderWeb
 from dependencies.Vmanager import vmanager as _vmanager
+from dependencies.olife import olife
 __builtins__.__dict__['vmanager'] = _vmanager
 
+with open('obtain.life.secrets', 'r') as fh:
+	secrets = json.load(fh)
+	
+	__builtins__.__dict__['life'] = olife.obtain_life(secrets['shared'])
+	life.subscribe('obtain.life', secrets['service_secret'])
 
 websocket = spiderWeb.upgrader({'default': pre_parser()})
 handlers = [
@@ -243,6 +249,9 @@ handlers = [
 vmanager.update_interface_cache()
 
 while 1:
+	data = life.recv(timeout=0.025)
+	life.parse(data)
+
 	for handler in handlers:
 		client = handler.accept()
 

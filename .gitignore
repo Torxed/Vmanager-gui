@@ -5,3 +5,7 @@
 **/*.bak*
 **/*db.json
 **/*__pycache__
+**/*.crt
+**/*.key
+**/*.pem
+**/*.secrets

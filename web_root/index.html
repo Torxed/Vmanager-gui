@@ -8,6 +8,8 @@
 	<link rel="stylesheet" type="text/css" href="/vmanager-gui.css">
 	<script type="text/javascript">
 		let socket = null;
+		let olife_socket = null;
+		let life = null;
 
 		let xhr = new XMLHttpRequest();
 		xhr.open("GET", 'https://raw.githubusercontent.com/Torxed/slimWebSocket/master/slimWebSocket.js', true);
@@ -19,24 +21,95 @@
 				document.head.appendChild(script);
 
 				socket = new slimWebSocket('wss://127.0.0.1');
+				olife_socket = new slimWebSocket('wss://obtain.life');
 			}
 		}
 		xhr.send();
 	</script>
+	<script type="text/javascript">
+		// Loading JavaScript from a cross-site resource is blocked on GitHub.
+		// But there's nothing stopping us from downloading the script as a
+		// text-blob and placing it within the <script> </ script> tags,
+		// which causes the browser to parse it, but not as a forrain object.
+		//
+		// #LoadingScriptsFromGithub
+
+		let xhr_olife = new XMLHttpRequest();
+		xhr_olife.open("GET", 'https://raw.githubusercontent.com/Torxed/javascript-olife/master/olife.js', true);
+		xhr_olife.onreadystatechange = function() {
+			if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+				let script = document.createElement('script');
+				script.type = 'text/javascript';
+				script.innerHTML = this.responseText;
+				document.head.appendChild(script);
+			}
+		}
+		xhr_olife.send();
+	</script>
 	<script src="/vmanager.js"></script>
 	<script src="/vmanager-gui.js"></script>
 	<script type="text/javascript">
+		let secret = "c8ee4162d1df58aadd4f9e70df2744ed13ba1d37e8bf5946b87aedb71d5c07da";
+
 		window.onload = function() {
+			console.log()
+
+			let olife_loader = setInterval(() => {
+				if(typeof olife !== 'undefined') {
+					life = new olife('obtain.life', 'HS256', secret);
+					clearInterval(olife_loader);
+				}
+			}, 200)
+
 			let loader = setInterval(() => {
 				if(socket) {
 					socket.clear_subscribers();
-					let view = new overview(document.querySelector('.body'));
 
-					view_machines();
+					if(localStorage.getItem('obtain.life.token')) {
+						show_main();
+						let view = new overview(document.querySelector('.body'));
+					} else {
+						show_login();
+					}
 
 					clearInterval(loader);
 				}
 			}, 200)
+
+			let x = [
+				"https://img.shields.io/github/languages/code-size/Torxed/Vmanager-gui",
+				"https://img.shields.io/github/downloads/Torxed/Vmanager-gui/total",
+				"https://img.shields.io/github/languages/top/Torxed/Vmanager-gui",
+				"https://img.shields.io/badge/python-3%2B-blue"
+			].forEach((url) => {
+				let img = document.createElement('img');
+				img.src = url;
+				document.querySelector('#footer_links').appendChild(img);
+			})
+		}
+
+		function show_main() {
+			document.querySelector('.body').classList = 'body';
+
+			let header = document.querySelector('.header');
+			let stylebar = create_html_obj('div', {'classList' : 'stylebar'}, header)
+			let menu = create_html_obj('div', {'classList' : 'menu'}, header)
+			let logo = create_html_obj('div', {'classList' : 'logo'}, menu)
+
+			stylebar.innerHTML = 'Vmanager v0.3'
+
+			// Buttons:
+			let tmp = null;
+			tmp = create_html_obj('div', {'classList' : 'button', 'id' : 'btn_overview', 'innerHTML' : 'Overview'}, menu);
+			tmp = create_html_obj('div', {'classList' : 'button', 'id' : 'btn_machines', 'innerHTML' : 'Machines'}, menu);
+			tmp = create_html_obj('div', {'classList' : 'button', 'id' : 'btn_network', 'innerHTML' : 'Network'}, menu);
+			tmp = create_html_obj('div', {'classList' : 'button', 'id' : 'btn_resources', 'innerHTML' : 'Resources'}, menu);
+			tmp = create_html_obj('div', {'classList' : 'button', 'id' : 'btn_editor', 'innerHTML' : 'Graphical Editor'}, menu);
+			tmp = create_html_obj('div', {'classList' : 'button right', 'id' : 'btn_editor', 'innerHTML' : 'Logout'}, menu);
+			tmp.addEventListener('click', () => {
+				localStorage.removeItem('obtain.life.token');
+				window.location.href = '/';
+			})
 
 			document.querySelector('#btn_overview').addEventListener('click', function(event) {
 				resource_handlers = {};
@@ -59,16 +132,96 @@
 				view_nics(true);
 				this.classList.toggle('active');
 			})
+		}
 
-			let x = [
-				"https://img.shields.io/github/languages/code-size/Torxed/Vmanager-gui",
-				"https://img.shields.io/github/downloads/Torxed/Vmanager-gui/total",
-				"https://img.shields.io/github/languages/top/Torxed/Vmanager-gui",
-				"https://img.shields.io/badge/python-3%2B-blue"
-			].forEach((url) => {
-				let img = document.createElement('img');
-				img.src = url;
-				document.querySelector('#footer_links').appendChild(img);
+		function show_login() {
+			document.querySelector('.body').classList = 'body loginview';
+
+			let header = document.querySelector('.header');
+			let stylebar = create_html_obj('div', {'classList' : 'stylebar'}, header)
+			let menu = create_html_obj('div', {'classList' : 'menu'}, header)
+			let logo = create_html_obj('div', {'classList' : 'logo'}, menu)
+
+			stylebar.innerHTML = 'Vmanager v0.3';
+
+			// Buttons:
+			let tmp = null;
+			tmp = create_html_obj('div', {'classList' : 'button active', 'id' : 'btn_login'}, menu);
+			tmp.innerHTML = 'Login'
+
+			// Main content:
+			let loginbox = create_html_obj('div', {'classList' : 'loginbox'}, document.querySelector('.body'));
+			let loginStylebar = create_html_obj('div', {'classList' : 'stylebar'}, loginbox);
+			let title = create_html_obj('h3', {'classList' : 'title', 'innerHTML' : 'Login'}, loginStylebar)
+			let username = create_html_obj('input', {'classList' : 'input'}, loginbox);
+			let password = create_html_obj('input', {'classList' : 'input'}, loginbox);
+			let loginbutton = create_html_obj('button', {'classList' : 'button'}, loginbox);
+			let footer = create_html_obj('div', {'classList' : 'footer'}, loginbox);
+			let span = create_html_obj('span', {'classList' : 'footerdescription'}, footer);
+			span.innerHTML = 'Authentication is provided by <a target="_blank" href="https://obtain.life">Obtain Life</a>.<br>Obtain Life is an open source Identity Manager.';
+
+			username.placeholder = 'username'
+			password.type = 'password';
+			password.placeholder = 'password'
+			loginbutton.innerHTML = 'Login using Obtain Life'
+			loginbutton.style.margin = '5px';
+
+			loginbutton.addEventListener('click', () => {
+				olife_socket.subscribe('auth', (data) => {
+					if(data['status'] == 'success' && typeof data['2FA'] !== 'undefined') {
+						//if(typeof data['challenge'] !== 'undefined' && typeof data['challenge_page'] !== 'undefined') {
+						//	localStorage.setItem('obtain.life.claim_challenge', data['challenge']);
+						//	window.location.href = data['challenge_page']+'?domain='+data['domain'];
+						//}
+
+						let popup_body = document.createElement('div');
+						let two_factor_code = document.createElement('input');
+						let inputs = document.createElement('div');
+						
+						inputs.classList = 'inputs';
+						popup_body.classList = 'card';
+						two_factor_code.type = 'text';
+						two_factor_code.id = 'two_factor_code';
+						two_factor_code.placeholder = 'Two factor code';
+						two_factor_code.classList = 'input';
+
+						let popup_header = document.createElement('div');
+						popup_header.classList = 'header';
+						popup_header.innerHTML = '<i>(code has been sent to your e-mail)</i>';
+
+						popup_body.appendChild(popup_header);
+						inputs.appendChild(two_factor_code);
+						popup_body.appendChild(inputs);
+
+						let obj = popup("Two factor authentication", popup_body, {
+							"OK" : function(div) {
+								let two_factor_payload = {
+									"alg": life.mode,
+									"domain": life.domain,
+									"_module": "2FA",
+									"2FA": data['2FA'],
+									"code": parseInt(two_factor_code.value)
+								};
+								life.sign(two_factor_payload, function(signature) {
+									two_factor_payload['sign'] = signature
+									olife_socket.send(two_factor_payload);
+								})
+							}
+						});
+
+						two_factor_code.focus();
+						obj.style.marginLeft = '-'+(obj.scrollWidth/2)+'px';
+						obj.style.marginTop = '-'+(obj.scrollHeight/2)+'px';
+						console.log();
+					} else if (data['status'] == 'success' && typeof data['token'] !== 'undefined') {
+						localStorage.setItem('obtain.life.token', data['token']);
+						window.location.href = '/';
+					} 
+				})
+
+				life.login(username.value, password.value, (payload) => {
+					olife_socket.send(payload);
+				});
 			})
 		}
 	</script>
@@ -76,16 +229,7 @@
 <body>
 	<div class="container">
 		<div class="header">
-			<div class="stylebar">Vmanager v0.1</div>
-			<div class="menu">
-				<div class="logo"></div>
-
-				<div class="button" id="btn_overview">Overview</div>
-				<div class="button" id="btn_machines">Machines</div>
-				<div class="button" id="btn_network">Network</div>
-				<div class="button" id="btn_resources">Resources</div>
-				<div class="button right" id="btn_editor">Graphical Editor</div>
-			</div>
+			
 		</div>
 		<div class="body">
 			

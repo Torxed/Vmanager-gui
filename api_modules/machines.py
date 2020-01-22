@@ -5,7 +5,7 @@ def get_overview():
 	response = {'machines' : {}}
 	for machine_name in vmanager.machines:
 		response['machines'][machine_name] = {
-			'nics' : len(vmanager.machines[machine_name].nics),
+			'nics' : [x.__dump__() for x in vmanager.machines[machine_name].nics],
 			'hdds' : len(vmanager.machines[machine_name].harddrives),
 			'cds' : vmanager.machines[machine_name].cd.filename
 		}
@@ -16,8 +16,9 @@ def get_machine_info(target=None):
 	response = {'machines' : {}}
 	for machine_name in vmanager.machines:
 		if target and machine_name != target: continue
+		print(vmanager.machines[machine_name].nics)
 		response['machines'][machine_name] = {
-			'nics' : len(vmanager.machines[machine_name].nics),
+			'nics' : [x.__dump__() for x in vmanager.machines[machine_name].nics],
 			'hdds' : len(vmanager.machines[machine_name].harddrives),
 			'cds' : vmanager.machines[machine_name].cd.filename
 		}

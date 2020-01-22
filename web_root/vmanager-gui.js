@@ -44,6 +44,8 @@ function popup(title_content, body_content, buttons_struct=null) {
 }
 
 function append_stats_to_html_obj(obj, stats) {
+	if (typeof stats === 'undefined')
+		return;
 	if (typeof stats.id !== 'undefined')
 		obj.id = stats.id;
 	if (typeof stats.classList !== 'undefined')
@@ -273,7 +275,32 @@ class overview {
 					json_payload['machines'],
 					{'classList' : 'table overview'}, this.machines, (row) => {
 						view_machine(row);
-				});
+					},
+					{
+						'cds' : (row, column, data) => {
+							let el = create_html_obj('div');
+							el.innerHTML = data.split(/[\\\/]/).pop();
+							return el;
+						},
+						'nics' : (row, column, data) => {
+							console.log(row, column, data)
+							let num = data.length;
+							if(num > 2) {
+								let obj = create_html_obj('span', {'classList' : 'nics'})
+								obj.innerHTML = num;
+								return obj
+							} else {
+								let container = create_html_obj('div', {'classList' : 'nics'});
+
+								data.forEach((nic) => {
+									let obj = create_html_obj('span', {'classList' : 'nic_item'}, container);
+									obj.innerHTML = nic['ifname'] + ' (' + nic['mac'].toUpperCase() + ')';
+								})
+
+								return container
+							}
+						}
+					});
 
 				console.log('Adding machines:', this.machines);
 				this.container.appendChild(this.machines);
@@ -353,7 +380,32 @@ class machines {
 					json_payload['machines'],
 					{'classList' : 'table machines'}, this.machines, (row) => {
 						view_machine(row);
-				})
+					},
+					{
+						'cds' : (row, column, data) => {
+							let el = create_html_obj('div');
+							el.innerHTML = data.split(/[\\\/]/).pop();
+							return el;
+						},
+						'nics' : (row, column, data) => {
+							console.log(row, column, data)
+							let num = data.length;
+							if(num > 2) {
+								let obj = create_html_obj('span', {'classList' : 'nics'})
+								obj.innerHTML = num;
+								return obj
+							} else {
+								let container = create_html_obj('div', {'classList' : 'nics'});
+
+								data.forEach((nic) => {
+									let obj = create_html_obj('span', {'classList' : 'nic_item'}, container);
+									obj.innerHTML = nic['ifname'] + ' (' + nic['mac'].toUpperCase() + ')';
+								})
+
+								return container
+							}
+						}
+					})
 				
 				this.container.innerHTML = '';
 				this.container.appendChild(this.main_area);

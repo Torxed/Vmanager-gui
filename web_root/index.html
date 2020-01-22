@@ -28,7 +28,6 @@
 	<script type="text/javascript">
 		window.onload = function() {
 			let loader = setInterval(() => {
-				console.log('moo')
 				if(socket) {
 					socket.clear_subscribers();
 					let view = new overview(document.querySelector('.body'));

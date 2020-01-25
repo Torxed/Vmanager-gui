@@ -3,24 +3,24 @@ from os.path import isdir, isfile
 
 def get_overview():
 	response = {'machines' : {}}
-	for machine_name in vmanager.machines:
+	for machine_name in vmanager.datastore['machines']:
 		response['machines'][machine_name] = {
-			'nics' : [x.__dump__() for x in vmanager.machines[machine_name].nics],
-			'hdds' : len(vmanager.machines[machine_name].harddrives),
-			'cds' : vmanager.machines[machine_name].cd.filename
+			'nics' : [x.__dump__() for x in vmanager.datastore['machines'][machine_name].nics],
+			'hdds' : len(vmanager.datastore['machines'][machine_name].harddrives),
+			'cds' : vmanager.datastore['machines'][machine_name].cd.filename
 		}
 
 	return response
 
 def get_machine_info(target=None):
 	response = {'machines' : {}}
-	for machine_name in vmanager.machines:
+	for machine_name in vmanager.datastore['machines']:
 		if target and machine_name != target: continue
-		print(vmanager.machines[machine_name].nics)
+		print(vmanager.datastore['machines'][machine_name].nics)
 		response['machines'][machine_name] = {
-			'nics' : [x.__dump__() for x in vmanager.machines[machine_name].nics],
-			'hdds' : len(vmanager.machines[machine_name].harddrives),
-			'cds' : vmanager.machines[machine_name].cd.filename
+			'nics' : [x.__dump__() for x in vmanager.datastore['machines'][machine_name].nics],
+			'hdds' : len(vmanager.datastore['machines'][machine_name].harddrives),
+			'cds' : vmanager.datastore['machines'][machine_name].cd.filename
 		}
 
 	return response

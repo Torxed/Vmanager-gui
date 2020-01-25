@@ -246,7 +246,10 @@ handlers = [
 	slimhttpd.https_serve(upgrades={b'websocket': websocket}, cert='cert.pem', key='key.pem')
 ]
 
+vmanager.get_memory_db()
+vmanager.convert_memory_into_objects()
 vmanager.update_interface_cache()
+vmanager.save_db() # Start saving the database every 5 seconds
 
 while 1:
 	data = life.recv(timeout=0.025)

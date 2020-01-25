@@ -2,10 +2,10 @@ import json
 from os.path import isdir, isfile
 
 def get_machine_status(machine_name):
-	if not machine_name in vmanager.machines:
+	if not machine_name in vmanager.datastore['machines']:
 		return None, None
 	
-	machine = vmanager.machines[machine_name]
+	machine = vmanager.datastore['machines'][machine_name]
 
 	nics = {}
 	for nic in machine.nics:
@@ -59,11 +59,11 @@ class parser():
 			machine = vmanager.Machine(name=data['new']['name'], display=True, harddrives=data['new']['harddrives'], nics=data['new']['nics'], cd=data['new']['cd'])
 			
 			response = {'machines' : {}}
-			for machine_name in vmanager.machines:
+			for machine_name in vmanager.datastore['machines']:
 				response['machines'][machine_name] = {
-					'nics' : len(vmanager.machines[machine_name].nics),
-					'hdds' : len(vmanager.machines[machine_name].harddrives),
-					'cds' : vmanager.machines[machine_name].cd.filename
+					'nics' : len(vmanager.datastore['machines'][machine_name].nics),
+					'hdds' : len(vmanager.datastore['machines'][machine_name].harddrives),
+					'cds' : vmanager.datastore['machines'][machine_name].cd.filename
 				}
 
 			return response

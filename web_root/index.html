@@ -68,6 +68,7 @@
 					if(localStorage.getItem('obtain.life.token')) {
 						show_main();
 						let view = new overview(document.querySelector('.body'));
+						view_machines();
 					} else {
 						show_login();
 					}

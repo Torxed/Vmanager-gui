@@ -90,18 +90,35 @@
 		}
 
 		function show_main() {
-			document.querySelector('.body').classList = 'body';
+			let leftSide = document.querySelector('.leftSide');
+			let rightSide = document.querySelector('.rightSide');
 
-			let header = document.querySelector('.header');
-			let stylebar = create_html_obj('div', {'classList' : 'stylebar'}, header)
-			let menu = create_html_obj('div', {'classList' : 'menu'}, header)
-			let logo = create_html_obj('div', {'classList' : 'logo'}, menu)
+			let categoriesHeader = create_html_obj('div', {'classList' : 'header dark'}, leftSide);
+			let contentHeader = create_html_obj('div', {'classList' : 'header'}, rightSide);
 
-			stylebar.innerHTML = 'Vmanager v0.3'
+			let logoname_holder = create_html_obj('div', {'classList' : 'logoholder'}, categoriesHeader)
+			let logoname = create_html_obj('h3', {'classList' : 'logname', 'innerHTML' : 'Vmanager'}, logoname_holder)
+
+			let profileBox = create_html_obj('div', {'classList' : 'profileBox'}, leftSide);
+			let profileIcon = create_html_obj('div', {'classList' : 'profilePhoto'}, profileBox);
+			let profileInfo = create_html_obj('div', {'classList' : 'profileInfo'}, profileBox);
+			let profilename = create_html_obj('span', {'classList' : 'profilename', 'innerHTML' : 'Anton Hvornum'}, profileInfo);
+			let profilerole = create_html_obj('div', {'classList' : 'profilerole', 'innerHTML' : 'Administrator'}, profileInfo);
+
+			let categories = ['Machines', 'Resources', 'Network'];
+			categories.forEach((category) => {
+				let categoryObj = create_html_obj('div', {'classList' : 'category'}, leftSide);
+				let categoryHeader = create_html_obj('div', {'classList' : 'subheader', 'innerHTML' : category}, categoryObj);
+				if(category == 'Machines')
+					categoryHeader.classList.toggle('active');
+			})
+
+			let menu = create_html_obj('div', {'classList' : 'menu'}, contentHeader);
+			let area = create_html_obj('div', {'classList' : 'body'}, rightSide);
 
 			// Buttons:
 			let tmp = null;
-			tmp = create_html_obj('div', {'classList' : 'button', 'id' : 'btn_overview', 'innerHTML' : 'Overview'}, menu);
+			tmp = create_html_obj('div', {'classList' : 'button active', 'id' : 'btn_overview', 'innerHTML' : 'Overview'}, menu);
 			tmp = create_html_obj('div', {'classList' : 'button', 'id' : 'btn_machines', 'innerHTML' : 'Machines'}, menu);
 			tmp = create_html_obj('div', {'classList' : 'button', 'id' : 'btn_network', 'innerHTML' : 'Network'}, menu);
 			tmp = create_html_obj('div', {'classList' : 'button', 'id' : 'btn_resources', 'innerHTML' : 'Resources'}, menu);
@@ -115,7 +132,6 @@
 			document.querySelector('#btn_overview').addEventListener('click', function(event) {
 				resource_handlers = {};
 				let view = new overview(document.querySelector('.body'));
-
 				view_machines();
 			})
 
@@ -229,17 +245,14 @@
 </head>
 <body>
 	<div class="container">
-		<div class="header">
+		<div class="leftSide"></div>
+		<div class="rightSide">
+		</div>
+	</div>
+	<div class="footer">
+		<a href="https://github.com/Torxed/Vmanager-gui" id="footer_links">
 			
-		</div>
-		<div class="body">
-			
-		</div>
-		<div class="footer">
-			<a href="https://github.com/Torxed/Vmanager-gui" id="footer_links">
-				
-			</a>
-		</div>
+		</a>
 	</div>
 </body>
 </html>

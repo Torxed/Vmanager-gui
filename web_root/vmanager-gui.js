@@ -77,9 +77,9 @@ function h3(text, stats={}, parent=null) {
 function table(headers, entries, stats, parent, row_click=null, special_columns={}) {
 	let o = create_html_obj('table', stats, parent);
 
-	let header = create_html_obj('tr', {'classList' : 'header'}, o);
+	let header = create_html_obj('tr', {'classList' : 'tableheader'}, o);
 	headers.forEach((title) => {
-		let h = create_html_obj('td', {'classList' : 'header'}, header);
+		let h = create_html_obj('td', {'classList' : 'tableheader'}, header);
 		h.innerHTML = title;
 	})
 
@@ -88,11 +88,14 @@ function table(headers, entries, stats, parent, row_click=null, special_columns=
 		let first_column = create_html_obj('td', {'classList' : 'column'}, row_obj);
 		first_column.innerHTML = row;
 		Object.keys(entries[row]).forEach((column) => {
-			let column_obj = create_html_obj('td', {'classList' : 'column'}, row_obj);
 			if (typeof special_columns[column] !== 'undefined') {
 				let special_obj = special_columns[column](row, column, entries[row][column]);
-				column_obj.appendChild(special_obj);
+				if(special_obj) {
+					let column_obj = create_html_obj('td', {'classList' : 'column'}, row_obj);
+					column_obj.appendChild(special_obj);
+				}
 			} else {
+				let column_obj = create_html_obj('td', {'classList' : 'column'}, row_obj);
 				column_obj.innerHTML = entries[row][column];
 			}
 		})
@@ -256,6 +259,7 @@ class overview {
 
 	build() {
 		this.container.innerHTML = '';
+		
 		console.log('Overview is rendering.')
 		this.main_area = create_html_obj('div', {'classList' : 'overview'}, this.container);
 
@@ -270,8 +274,9 @@ class overview {
 			if (typeof json_payload['machines'] !== 'undefined') {
 				this.container.innerHTML = '';
 
+				console.log(json_payload);
+
 				this.machines = div({'classList' : 'machines'}, this.main_area);
-				let machines_header = h3('Machines', {}, this.machines);
 				let machine_list = table(
 					['Machine Name', 'NIC\'s', 'Harddrives', 'CD\'s'],
 					json_payload['machines'],
@@ -304,7 +309,6 @@ class overview {
 						}
 					});
 
-				console.log('Adding machines:', this.machines);
 				this.container.appendChild(this.machines);
 			}
 		})
@@ -546,6 +550,7 @@ class networkinterfaces {
 						view_nic(row);
 					},
 					{
+						'ifname' : () => {},
 						'state' : (row, column, data) => {
 							let obj = slider(row, column, data);
 							obj.querySelector('input').setAttribute('nic', row);
@@ -591,6 +596,7 @@ class networkinterfaces {
 						view_switch(row);
 					},
 					{
+						'ifname' : () => {},
 						'connected_to' : connected_to,
 						'state' : (row, column, data) => {
 							let obj = slider(row, column, data);
@@ -613,6 +619,8 @@ class networkinterfaces {
 						view_router(row);
 					},
 					{
+						'ifname' : () => {},
+						'trunk' : () => {}, // We'll use connected_to instead.
 						'connected_to' : connected_to,
 						'state' : (row, column, data) => {
 							let obj = slider(row, column, data);

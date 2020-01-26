@@ -27,6 +27,7 @@ def get_machine_info(target=None):
 
 class parser():
 	def process(self, path, client, data, headers, fileno, addr, *args, **kwargs):
+		print(data)
 		if not 'machines' in data:
 			return get_overview()
 

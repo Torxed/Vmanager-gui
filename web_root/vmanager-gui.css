@@ -5,7 +5,18 @@
 	--light: #819ca9;
 	--p_text: #FFFFFF;
 	--borders: #8899a1;
-	
+	--background: #222d32;
+	--background-dark: #1e282c;
+	--background-darker: #1a2226;
+	--background-dark-color: #4b646f;
+	--blue: #3c8dbc;
+	--blue-dark: #367fa9;
+	--background-light: #ecf0f5;
+	--card-border: #d2d6de;
+	--card-background: #FFFFFF;
+	--white: #FFFFFF;
+	--cream: #b8c7ce;
+
 	--backdrop_dark: #E1E2E1;
 	--backdrop_light: #F5F5F6;
 
@@ -36,6 +47,10 @@ body, html {
 	-ms-text-size-adjust: 100%;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+
+	color: var(--white);
+	display: flex;
+    flex-direction: column;
 }
 
 h3, table, tr, td {
@@ -52,32 +67,76 @@ h3 {
 
 .container {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	justify-content: flex-start;
 	align-content: flex-start;
 	height: 100%;
 }
 
-.container > .header {
-	background-color: var(--primary);
-	color: var(--p_text);
+.leftSide {
+	flex-grow: 0;
+	background-color: var(--background);
 }
 
-.container > .header > .menu,
-.submenu {
+.rightSide {
+	flex-grow: 1;
+}
+
+.header {}
+.header.dark {
+	background-color: var(--blue-dark);
+}
+
+.profileBox {
 	display: flex;
 	flex-direction: row;
-	padding: 5px;
-}
-.submenu {
-	height: 30px;
 }
 
-.container > .header > .menu > .logo {
+	.profilePhoto {
+		background-image: url('https://avatars1.githubusercontent.com/u/861439?s=460&v=4');
+		background-size: cover;
+		min-width: 64px;
+		min-height: 64px;
+		margin: 10px;
+		border-radius: 32px;
+		border: 1px solid var(--g_primary);
+	}
+
+	.profileInfo {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		flex-grow: 1;
+	}
+
+		.profilerole {
+			color: var(--background-dark-color);
+		}
+
+.subheader {
+	background-color: var(--background-darker);
+	color: var(--background-dark-color);
+	padding: 10px;
+}
+
+.subheader.active {
+	color: var(--white);
+}
+
+.logoholder {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding-left: 20px;
+	padding-right: 20px;
+	min-width: 200px;
+}
+
+.logo {
 	background-image: url('/logo.png');
 	background-size: cover;
-	min-width: 32px;
-	min-height: 32px;
+	min-width: 50px;
+	min-height: 50px;
 	max-width: 64px;
 	max-height: 64px;
 
@@ -85,69 +144,44 @@ h3 {
 	margin-left: 5px;
 }
 
-.menu > .button,
-.submenu > .button {
+.menu {
 	display: flex;
+	flex-direction: row;
 	align-items: center;
-	justify-content: center;
-
-	margin-left: 2.5px;
-	margin-right: 2.5px;
-	padding-left: 10px;
-	padding-right: 10px;
-
-	border: 1px solid var(--borders);
-	border-radius: 3px;
-	cursor: pointer;
-}
-.submenu > .button {
-	background-color: var(--backdrop_dark);
-}
-.submenu > .button:hover {
-	color: var(--g_primary);
-	background-color: #FFFFFF;
 }
 
-.container > .header > .menu > .button:hover {
-	background-color: var(--backdrop_light);
-	color: var(--o_text);
-	cursor: pointer;
-}
-
-i.fas {
-	margin-right: 10px;
-	color: var(--g_dark);
-}
-
-.button.active {
-	color: var(--o_text);
-	background-color: var(--backdrop_light);
-}
-
-.stylebar {
-	background-color: var(--dark);
-	border-bottom: 0.5px solid var(--borders);
-	min-height: 15px;
-	font-size: 0.7em;
+.header {
+	background-color: var(--blue);
+	min-height: 50px;
 
 	display: flex;
 	flex-direction: row;
 
-	justify-content: flex-end;
 	padding-right: 5px;
 
-	color: var(--borders);
+	color: var(--white);
 }
 
-.stylebar > h3 {
-	color: var(--o_primary);
-	padding-bottom: 2px;
-	margin-right: 3px;
+.button {
+	cursor: pointer;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
+	display: flex;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
-a {
-	text-decoration: none;
-	color: var(--g_dark)
+.button:hover {
+	background-color: var(--blue-dark);
+}
+
+.button.active {
+	background-color: var(--backdrop_light);
+	color: #000000;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	margin-top: 15px;
 }
 
 .loginbox {
@@ -209,10 +243,14 @@ a {
 	margin-left: auto !important;
 }
 
+.machines {
+	padding: 30px;
+}
+
 tr {
 	margin: 0px;
 }
-td.header {
+td.tableheader {
 	margin: 0px;
 	padding: 5px;
 	background-color: var(--primary) !important;

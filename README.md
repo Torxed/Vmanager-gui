@@ -2,7 +2,7 @@
 
 A graphical front-end for [python-Vmanager](https://github.com/Torxed/Vmanager).
 
-![screen_demo](documentation/screen_demo.gif)
+![screenshot](documentation/screenshot.png)
 
 # Dependencies
 
